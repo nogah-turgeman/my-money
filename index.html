@@ -128,16 +128,16 @@ header h1 .wave{display:inline-block;transform-origin:70% 70%}
 
 /* sheet */
 .veil{position:fixed;inset:0;background:rgba(26,22,38,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--surface);width:100%;max-width:540px;max-height:88%;overflow:auto;border-radius:28px 28px 0 0;
+.sheet{background:var(--surface);width:100%;max-width:540px;max-height:88%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;border-radius:28px 28px 0 0;
   padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));
   padding-block:10px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 .sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);align-self:center}
 .sheet h3{font-family:var(--display);font-weight:800;font-size:22px;margin:0}
 .sheet .sub{color:var(--muted);font-size:14px;margin:-8px 0 0}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
-label.f input,label.f select{font:inherit;color:var(--ink);padding:12px 14px;border:2px solid var(--line);border-radius:16px;background:var(--bg);width:100%}
+label.f input,label.f select{font:inherit;font-size:16px;color:var(--ink);padding:12px 14px;border:2px solid var(--line);border-radius:16px;background:var(--bg);width:100%}
 .two{display:grid;grid-template-columns:2fr 1fr;gap:10px}
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .cats button{border:2px solid transparent;border-radius:16px;padding:8px 4px;background:color-mix(in srgb, var(--k) 14%, var(--surface));display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;line-height:1.2;min-width:0}
 .cats button span{font-size:22px}
 .cats button[aria-pressed="true"]{border-color:var(--k);background:color-mix(in srgb, var(--k) 28%, var(--surface))}
@@ -148,7 +148,7 @@ label.f input,label.f select{font:inherit;color:var(--ink);padding:12px 14px;bor
 .qrow b{font-weight:400;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qrow small{color:var(--muted);font-size:12px}
 .qrow div{min-width:0}
-.qrow input{font:inherit;color:var(--ink);padding:9px 12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:100%;text-align:left;direction:ltr}
+.qrow input{font:inherit;font-size:16px;color:var(--ink);padding:9px 12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:100%;text-align:left;direction:ltr}
 .qrow .go{width:40px;height:40px;border-radius:14px;font-size:17px;box-shadow:none;background:var(--bg)}
 .qrow .nogo{width:40px}
 .sugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}
@@ -161,7 +161,7 @@ label.f input,label.f select{font:inherit;color:var(--ink);padding:12px 14px;bor
   header h1 .wave{animation:wave 1.6s ease-in-out 1}@keyframes wave{20%{transform:rotate(18deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(12deg)}80%{transform:rotate(-4deg)}}
   .toast{animation:pop .25s cubic-bezier(.2,1.4,.4,1)}@keyframes pop{from{transform:translate(-50%,12px);opacity:0}}
 }
-@media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:380px){.cats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 
 </head>
@@ -306,7 +306,10 @@ function sparkline(h){
 }
 
 /* ---------- sheets ---------- */
-function openSheet(html, onMount){ $('#sheet').innerHTML = '<div class="grab"></div>'+html; $('#veil').hidden = false; onMount && onMount($('#sheet')); }
+function openSheet(html, onMount){ $('#sheet').innerHTML = '<div class="grab"></div>'+html; $('#veil').hidden = false; fitVeil(); onMount && onMount($('#sheet')); }
+function fitVeil(){ const v=window.visualViewport, el=$('#veil'); if(!v||el.hidden) return;
+  el.style.top=v.offsetTop+'px'; el.style.height=v.height+'px'; el.style.bottom='auto'; }
+if(window.visualViewport){ visualViewport.addEventListener('resize',fitVeil); visualViewport.addEventListener('scroll',fitVeil); }
 function closeSheet(){ $('#veil').hidden = true; $('#sheet').innerHTML=''; }
 $('#veil').addEventListener('click', e=>{ if(e.target.id==='veil') closeSheet(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#veil').hidden) closeSheet(); });
@@ -318,11 +321,11 @@ function editSheet(acc){
   const cats = Object.entries(CATS).map(([key,c])=>`<button type="button" data-cat="${key}" aria-pressed="${key===cat}" style="${k(key)}"><span>${c.emoji}</span>${esc(c.short)}</button>`).join('');
   const curs = Object.keys(CUR).map(key=>`<option value="${key}" ${key===acc.cur?'selected':''}>${CUR[key]} ${key}</option>`).join('');
   openSheet(`<h3>${isNew?'➕ חשבון חדש':CATS[acc.cat].emoji+' '+esc(acc.name)}</h3>
-    <form id="accForm" style="display:flex;flex-direction:column;gap:14px">
+    <form id="accForm" novalidate style="display:flex;flex-direction:column;gap:14px">
       <div class="cats" role="group" aria-label="סוג">${cats}</div>
-      <label class="f">איך לקרוא לו<input id="fName" required placeholder="למשל: עו״ש משותף" value="${esc(acc.name)}"></label>
+      <label class="f">איך לקרוא לו<input id="fName" placeholder="למשל: עו״ש משותף" value="${esc(acc.name)}"></label>
       <label class="f">איפה הוא מנוהל<input id="fInst" placeholder="בנק, בית השקעות, חברת ביטוח" value="${esc(acc.inst)}"></label>
-      <label class="f">🔗 קישור לאתר (לא חובה)<input id="fLink" type="url" inputmode="url" dir="ltr" placeholder="www.example.co.il" value="${esc(acc.link||'')}"></label>
+      <label class="f">🔗 קישור לאתר (לא חובה)<input id="fLink" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" dir="ltr" placeholder="www.example.co.il" value="${esc(acc.link||'')}"></label>
       <div class="sugg" id="sugg"></div>
       <p class="hint">בטלפון, הרבה אתרים של בנקים וקופות נפתחים ישר באפליקציה שלהם.</p>
       <div class="two"><label class="f" id="balLbl">${CATS[cat].negative?'כמה נשאר להחזיר':'כמה יש שם'}<input id="fBal" inputmode="decimal" dir="ltr" value="${acc.bal||''}" placeholder="0"></label>
@@ -346,7 +349,7 @@ function editSheet(acc){
       const showSugg=()=>{ const g=suggestSite(fInst.value); sugg.innerHTML = g && !fLink.value ? `<button type="button">✨ ${esc(g)}</button>` : ''; };
       sugg.addEventListener('click',e=>{ if(e.target.closest('button')){ fLink.value=suggestSite(fInst.value); sugg.innerHTML=''; } });
       fInst.addEventListener('input',showSugg); fLink.addEventListener('input',showSugg); showSugg();
-      if(isNew) s.querySelector('#fName').focus();
+      
     });
 }
 
