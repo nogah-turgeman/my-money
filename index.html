@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="הכסף שלי">
+<meta name="theme-color" content="#FFF8F1">
+<meta name="robots" content="noindex">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23FFE08A%22/%3E%3Ctext x=%2250%22 y=%2268%22 font-size=%2260%22 text-anchor=%22middle%22%3E🐷%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🐷%3C/text%3E%3C/svg%3E">
+<title>הכסף שלי</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800;900&family=Varela+Round&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0}
+/* Layout: one playful column. A sunny summary card on top, a chunky colour bar, then accounts as rounded tiles with emoji bubbles. Pill buttons docked at the bottom. */
+:root{
+  --bg:#FFF8F1; --surface:#FFFFFF; --ink:#2B2340; --muted:#7B7290; --line:#F0E6DC;
+  --hero:#FFE08A; --hero-ink:#2B2340; --accent:#FF6B57; --accent-ink:#FFFFFF; --accent2:#2BB59A;
+  --warn:#C26A00; --warn-bg:#FFEBC7; --neg:#E0484A; --pos:#159B6B;
+  --c1:#3B82F6; --c2:#F472B6; --c3:#10B981; --c4:#8B5CF6; --c5:#22C55E; --c6:#F59E0B; --c7:#94A3B8; --c8:#EF4444;
+  --shadow:0 2px 0 rgba(43,35,64,.06), 0 8px 24px -12px rgba(43,35,64,.18);
+  --display:"Rubik", "Varela Round", system-ui, sans-serif;
+  --body:"Varela Round", "Rubik", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1A1626; --surface:#252036; --ink:#F6F1FF; --muted:#A99FC2; --line:#352E4B;
+  --hero:#4A3C1A; --hero-ink:#FFF1C9; --accent:#FF8A78; --accent-ink:#2B1410; --accent2:#4FD6B9;
+  --warn:#FFC266; --warn-bg:#47361A; --neg:#FF7A7C; --pos:#4FD69E;
+  --c1:#6EA4FF; --c2:#F79ACB; --c3:#3FD3A3; --c4:#A98BFF; --c5:#5EDD8A; --c6:#FFC04D; --c7:#A9B6C9; --c8:#FF7A7C;
+  --shadow:0 2px 0 rgba(0,0,0,.25), 0 10px 24px -12px rgba(0,0,0,.6);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1A1626; --surface:#252036; --ink:#F6F1FF; --muted:#A99FC2; --line:#352E4B;
+  --hero:#4A3C1A; --hero-ink:#FFF1C9; --accent:#FF8A78; --accent-ink:#2B1410; --accent2:#4FD6B9;
+  --warn:#FFC266; --warn-bg:#47361A; --neg:#FF7A7C; --pos:#4FD69E;
+  --c1:#6EA4FF; --c2:#F79ACB; --c3:#3FD3A3; --c4:#A98BFF; --c5:#5EDD8A; --c6:#FFC04D; --c7:#A9B6C9; --c8:#FF7A7C;
+  --shadow:0 2px 0 rgba(0,0,0,.25), 0 10px 24px -12px rgba(0,0,0,.6);
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:14px calc(100px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+header h1{font-family:var(--display);font-weight:800;font-size:24px;margin:0;display:flex;align-items:center;gap:8px}
+header h1 .wave{display:inline-block;transform-origin:70% 70%}
+.iconbtn{background:var(--surface);border:0;border-radius:999px;padding:8px 14px;font-size:14px;color:var(--ink);box-shadow:var(--shadow)}
+
+/* hero */
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:28px;padding:22px 20px 18px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero::after{content:"💰";position:absolute;inset-inline-start:auto;left:14px;top:10px;font-size:54px;opacity:.9;transform:rotate(-12deg)}
+.eyebrow{font-size:14px;opacity:.8}
+.total{font-family:var(--display);font-weight:900;font-size:clamp(40px,12vw,56px);line-height:1.05;margin:0;text-align:right}
+.delta{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;background:rgba(255,255,255,.55);border-radius:999px;padding:4px 12px;font-size:14px}
+:root[data-theme="dark"] .delta{background:rgba(0,0,0,.25)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .delta{background:rgba(0,0,0,.25)}}
+.delta .up{color:var(--pos);font-weight:700} .delta .down{color:var(--neg);font-weight:700}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pill{background:var(--surface);border-radius:20px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;box-shadow:var(--shadow);min-width:0}
+.pill span{font-size:13px;color:var(--muted)}
+.pill strong{font-family:var(--display);font-size:21px;font-weight:700}
+
+.card{background:var(--surface);border-radius:24px;padding:16px;box-shadow:var(--shadow)}
+.card h2{font-family:var(--display);font-size:16px;font-weight:700;margin:0 0 12px}
+.bar{display:flex;height:18px;border-radius:999px;overflow:hidden;background:var(--line);gap:3px}
+.bar i{display:block;height:100%;border-radius:999px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px 5px 9px;font-size:13px;
+  background:color-mix(in srgb, var(--k) 16%, var(--surface))}
+.chip b{font-weight:400;color:var(--muted)}
+
+.spark svg{display:block;width:100%;height:100px}
+.spark .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+
+.notice{background:var(--warn-bg);color:var(--ink);border-radius:20px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.notice button{background:var(--surface);border:0;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
+
+.group{display:flex;flex-direction:column;gap:8px}
+.group h2{font-family:var(--display);font-size:16px;font-weight:700;margin:6px 4px 0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.group h2 small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400}
+.rowwrap{display:flex;gap:8px;align-items:stretch}
+.rowwrap .row{flex:1;min-width:0}
+.go{flex:none;width:48px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;text-decoration:none;font-size:20px;color:var(--ink)}
+.go:active{transform:scale(.95)}
+.go:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);text-align:right;width:100%;transition:transform .12s}
+.row:active{transform:scale(.98)}
+.bubble{width:44px;height:44px;flex:none;border-radius:16px;display:grid;place-items:center;font-size:22px;background:color-mix(in srgb, var(--k) 20%, var(--surface))}
+.row .who{flex:1;min-width:0;display:flex;flex-direction:column}
+.row .who b{font-weight:400;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .who small{color:var(--muted);font-size:13px}
+.row .amt{font-family:var(--display);font-weight:700;font-size:17px;text-align:left}
+.row .amt small{display:block;font-family:var(--body);font-weight:400;font-size:12px;color:var(--muted)}
+.stale{display:inline-block;background:var(--warn-bg);color:var(--warn);font-size:12px;border-radius:999px;padding:0 8px;margin-inline-start:6px}
+.neg{color:var(--neg)}
+
+.empty{background:var(--surface);border-radius:28px;padding:30px 22px;display:flex;flex-direction:column;gap:14px;text-align:center;box-shadow:var(--shadow)}
+.empty .big{font-size:56px;line-height:1}
+.empty h2{font-family:var(--display);font-weight:800;margin:0;font-size:24px;text-wrap:balance}
+.empty p{margin:0;color:var(--muted)}
+.empty .emojis{font-size:26px;letter-spacing:6px}
+.empty .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+.primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:13px 20px;font-family:var(--display);font-weight:700;box-shadow:0 4px 0 color-mix(in srgb, var(--accent) 60%, #000)}
+.primary:active{transform:translateY(2px);box-shadow:0 2px 0 color-mix(in srgb, var(--accent) 60%, #000)}
+.ghost{background:var(--surface);border:0;border-radius:999px;padding:13px 20px;font-family:var(--display);font-weight:700;box-shadow:var(--shadow)}
+.danger{background:none;border:2px solid var(--neg);color:var(--neg);border-radius:999px;padding:11px 18px;font-weight:700}
+
+.dock{position:fixed;inset:auto 0 0 0;z-index:5;
+  background:linear-gradient(to top, var(--bg) 70%, transparent);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:18px calc(12px + env(safe-area-inset-bottom,0px))}
+.dock .in{max-width:540px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr;gap:10px}
+
+.status{font-size:12px;color:var(--muted);text-align:center;min-height:1em}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);border-radius:999px;padding:8px 16px;font-size:14px;z-index:30;pointer-events:none}
+
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(26,22,38,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:540px;max-height:88%;overflow:auto;border-radius:28px 28px 0 0;
+  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);align-self:center}
+.sheet h3{font-family:var(--display);font-weight:800;font-size:22px;margin:0}
+.sheet .sub{color:var(--muted);font-size:14px;margin:-8px 0 0}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+label.f input,label.f select{font:inherit;color:var(--ink);padding:12px 14px;border:2px solid var(--line);border-radius:16px;background:var(--bg);width:100%}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cats button{border:2px solid transparent;border-radius:16px;padding:8px 4px;background:color-mix(in srgb, var(--k) 14%, var(--surface));display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;line-height:1.2;min-width:0}
+.cats button span{font-size:22px}
+.cats button[aria-pressed="true"]{border-color:var(--k);background:color-mix(in srgb, var(--k) 28%, var(--surface))}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .primary{flex:1}
+.qrow{display:grid;grid-template-columns:32px 1fr 112px 40px;gap:10px;align-items:center;padding-block:6px}
+.qrow .e{font-size:22px;text-align:center}
+.qrow b{font-weight:400;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qrow small{color:var(--muted);font-size:12px}
+.qrow div{min-width:0}
+.qrow input{font:inherit;color:var(--ink);padding:9px 12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:100%;text-align:left;direction:ltr}
+.qrow .go{width:40px;height:40px;border-radius:14px;font-size:17px;box-shadow:none;background:var(--bg)}
+.qrow .nogo{width:40px}
+.sugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}
+.sugg button{border:0;border-radius:999px;background:var(--bg);padding:4px 12px;font-size:13px;direction:ltr}
+.hint{font-size:12px;color:var(--muted);margin-top:-8px}
+.qrow input.changed{border-color:var(--accent2)}
+
+@media (prefers-reduced-motion:no-preference){
+  .sheet{animation:up .25s cubic-bezier(.2,1.3,.4,1)}@keyframes up{from{transform:translateY(40px)}}
+  header h1 .wave{animation:wave 1.6s ease-in-out 1}@keyframes wave{20%{transform:rotate(18deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(12deg)}80%{transform:rotate(-4deg)}}
+  .toast{animation:pop .25s cubic-bezier(.2,1.4,.4,1)}@keyframes pop{from{transform:translate(-50%,12px);opacity:0}}
+}
+@media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <h1><span class="wave" aria-hidden="true">👋</span> הכסף שלי</h1>
+    <span style="display:flex;gap:8px"><button class="iconbtn" id="backupBtn" type="button" hidden>💾 גיבוי</button><button class="iconbtn" id="ratesBtn" type="button">💱 שערים</button></span>
+  </header>
+  <div id="main" style="display:flex;flex-direction:column;gap:18px"><p class="status">טוען… ⏳</p></div>
+  <p class="status" id="saveStatus"></p>
+</div>
+
+<div class="dock" id="dock" hidden>
+  <div class="in">
+    <button class="primary" id="quickBtn" type="button">✍️ עדכון יתרות</button>
+    <button class="ghost" id="addBtn" type="button">➕ חשבון</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<div class="veil" id="veil" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const CATS = {
+  bank:      {name:'עו"ש ובנק',       short:'בנק',     emoji:'🏦', color:'--c1', liquid:true,  staleDays:30},
+  deposit:   {name:'פיקדונות וחיסכון', short:'חיסכון',  emoji:'🐷', color:'--c2', liquid:true,  staleDays:60},
+  invest:    {name:'תיק השקעות',      short:'השקעות',  emoji:'📈', color:'--c3', liquid:true,  staleDays:30},
+  hishtalmut:{name:'קרן השתלמות',     short:'השתלמות', emoji:'🎓', color:'--c4', liquid:false, staleDays:120},
+  gemel:     {name:'קופת גמל',        short:'גמל',     emoji:'🌱', color:'--c5', liquid:false, staleDays:120},
+  pension:   {name:'פנסיה',           short:'פנסיה',   emoji:'🌴', color:'--c6', liquid:false, staleDays:120},
+  other:     {name:'אחר',             short:'אחר',     emoji:'✨', color:'--c7', liquid:true,  staleDays:90},
+  loan:      {name:'הלוואות ומשכנתא', short:'הלוואה',  emoji:'💳', color:'--c8', liquid:true,  staleDays:60, negative:true},
+};
+const CUR = {ILS:'₪', USD:'$', EUR:'€'};
+const blank = () => ({accounts:[], rates:{USD:3.7, EUR:4.0}, history:[], example:false});
+let state = blank();
+let mode = 'loading';
+let ref = null, saving = false, pending = false, saveTimer = null, dirty = false;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => '₪' + Math.round(Math.abs(n)).toLocaleString('he-IL');
+const fmtCur = (n,c) => (CUR[c]||'') + Math.round(n).toLocaleString('he-IL');
+const today = () => new Date().toISOString().slice(0,10);
+const daysAgo = d => d ? Math.floor((Date.now() - new Date(d).getTime())/86400000) : 9999;
+const toILS = a => a.bal * (a.cur === 'ILS' ? 1 : (state.rates[a.cur] || 1)) * (CATS[a.cat]?.negative ? -1 : 1);
+const uid = () => Math.random().toString(36).slice(2,10);
+const SITES = [
+  [/לאומי|leumi/i,'www.leumi.co.il'],[/פועלים|hapoalim/i,'www.bankhapoalim.co.il'],[/דיסקונט|discount/i,'www.discountbank.co.il'],
+  [/מזרחי|טפחות|mizrahi/i,'www.mizrahi-tefahot.co.il'],[/בינלאומי|fibi/i,'www.fibi.co.il'],[/וואן זירו|one ?zero/i,'www.onezerobank.com'],
+  [/מגדל|migdal/i,'www.migdal.co.il'],[/הראל|harel/i,'www.harel-group.co.il'],[/כלל|clal/i,'www.clalbit.co.il'],
+  [/מנורה|menora/i,'www.menoramivt.co.il'],[/פניקס|phoenix|fnx/i,'www.fnx.co.il'],[/מיטב|meitav/i,'www.meitav.co.il'],
+  [/אלטשולר|altshuler/i,'www.as-invest.co.il'],[/פסגות|psagot/i,'www.psagot.co.il'],
+];
+const suggestSite = inst => (SITES.find(([re])=>re.test(inst||''))||[])[1] || '';
+const cleanUrl = u => { u=(u||'').trim(); if(!u) return ''; if(!/^https?:\/\//i.test(u)) u='https://'+u.replace(/^\/+/,''); try{ const x=new URL(u); return /^https?:$/.test(x.protocol)?x.href:''; }catch(e){ return ''; } };
+const goLink = (a, cls='go') => a.link ? `<a class="${cls}" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer" aria-label="פתיחת האתר של ${esc(a.name)}" title="פתיחת האתר">🔗</a>` : '';
+const k = c => `--k:var(${CATS[c].color})`;
+
+function totals(){
+  let total=0, liquid=0, longt=0; const byCat={};
+  for(const a of state.accounts){
+    const v = toILS(a); total += v;
+    if(CATS[a.cat]?.liquid) liquid += v; else longt += v;
+    byCat[a.cat] = (byCat[a.cat]||0) + v;
+  }
+  return {total, liquid, longt, byCat};
+}
+
+function render(){
+  const main = $('#main');
+  $('#dock').hidden = mode === 'loading' || state.accounts.length === 0;
+  if(mode === 'loading') return;
+  if(state.accounts.length === 0){
+    main.innerHTML = `<div class="empty">
+      <div class="big">🐷</div>
+      <h2>כל הכסף שלך, במקום אחד</h2>
+      <div class="emojis" aria-hidden="true">🏦📈🎓🌱🌴</div>
+      <p>מוסיפים כל חשבון פעם אחת. פעם בחודש מעדכנים יתרות במסך אחד, ורואים את כל התמונה ואיך היא גדלה.</p>
+      <div class="btns"><button class="primary" type="button" data-act="add">➕ חשבון ראשון</button>
+      <button class="ghost" type="button" data-act="example">👀 הראי לי דוגמה</button></div></div>`;
+    return;
+  }
+  const t = totals();
+  const hist = state.history.slice().sort((a,b)=>a.d<b.d?-1:1);
+  let ref0 = null; for(const h of hist){ if(daysAgo(h.d) >= 25) ref0 = h; }
+  let deltaHtml = '🌟 נקודת ההתחלה שלך';
+  if(ref0){ const d = t.total - ref0.t; const p = ref0.t ? (d/Math.abs(ref0.t)*100) : 0;
+    const when = new Date(ref0.d).toLocaleDateString('he-IL',{day:'numeric',month:'long'});
+    deltaHtml = d>=0 ? `🎉 <span class="up num">+${fmt(d)} (${p.toFixed(1)}%)</span> מאז ${when}`
+                     : `🌧️ <span class="down num">−${fmt(d)} (${p.toFixed(1)}%)</span> מאז ${when}`; }
+  const positive = Object.entries(t.byCat).filter(([c,v])=>v>0);
+  const posSum = positive.reduce((s,[,v])=>s+v,0) || 1;
+  const bar = positive.map(([c,v])=>`<i style="width:${v/posSum*100}%;background:var(${CATS[c].color})" title="${esc(CATS[c].name)}"></i>`).join('');
+  const legend = Object.keys(CATS).filter(c=>t.byCat[c]!==undefined).map(c=>{const v=t.byCat[c];
+    return `<span class="chip" style="${k(c)}">${CATS[c].emoji} ${esc(CATS[c].short)} <b class="num">${v<0?'−'+fmt(v):Math.round(v/posSum*100)+'%'}</b></span>`}).join('');
+
+  const groups = Object.keys(CATS).map(c=>{
+    const list = state.accounts.filter(a=>a.cat===c); if(!list.length) return '';
+    const sum = list.reduce((s,a)=>s+toILS(a),0);
+    return `<section class="group"><h2><span>${CATS[c].emoji} ${esc(CATS[c].name)}</span><small class="num ${sum<0?'neg':''}">${sum<0?'−':''}${fmt(sum)}</small></h2>${
+      list.map(a=>{const ago=daysAgo(a.upd); const stale=ago>CATS[c].staleDays;
+        const when = ago===0?'עודכן היום ✓':ago===1?'עודכן אתמול':ago>3000?'עוד לא עודכן':`עודכן לפני ${ago} ימים`;
+        return `<div class="rowwrap"><button class="row" type="button" data-edit="${a.id}" style="${k(c)}"><span class="bubble" aria-hidden="true">${CATS[c].emoji}</span>
+        <span class="who"><b>${esc(a.name)}</b><small>${a.inst?esc(a.inst)+' · ':''}${when}${stale?'<span class="stale">⏰ לעדכן</span>':''}</small></span>
+        <span class="amt num ${CATS[c].negative?'neg':''}">${CATS[c].negative?'−':''}${fmt(toILS(a))}${a.cur!=='ILS'?`<small>${fmtCur(a.bal,a.cur)}</small>`:''}</span></button>${goLink(a)}</div>`}).join('')}</section>`;
+  }).join('');
+
+  const staleCount = state.accounts.filter(a=>daysAgo(a.upd)>CATS[a.cat].staleDays).length;
+  main.innerHTML = `
+    ${state.example?`<div class="notice"><span>🧪 אלה נתוני דוגמה. כשתהיי מוכנה, נקי אותם והכניסי את שלך.</span><button type="button" data-act="clear">ניקוי</button></div>`:''}
+    <section class="hero">
+      <span class="eyebrow">כל מה שיש לי, נטו</span>
+      <p class="total num ${t.total<0?'neg':''}">${t.total<0?'−':''}${fmt(t.total)}</p>
+      <span class="delta">${deltaHtml}</span>
+    </section>
+    <div class="split">
+      <div class="pill"><span>☀️ זמין עכשיו</span><strong class="num ${t.liquid<0?'neg':''}">${t.liquid<0?'−':''}${fmt(t.liquid)}</strong></div>
+      <div class="pill"><span>🌴 לעתיד</span><strong class="num">${fmt(t.longt)}</strong></div>
+    </div>
+    ${staleCount?`<div class="notice"><span>⏰ ${staleCount===1?'חשבון אחד מחכה לעדכון':staleCount+' חשבונות מחכים לעדכון'}</span><button type="button" data-act="quick">לעדכן</button></div>`:''}
+    <section class="card"><h2>🍰 איפה הכסף יושב</h2><div class="bar">${bar}</div><div class="legend">${legend}</div></section>
+    ${hist.length>=2?sparkline(hist):''}
+    ${groups}`;
+}
+
+function sparkline(h){
+  const W=320,H=100,P=8; const vs=h.map(x=>x.t); let mn=Math.min(...vs), mx=Math.max(...vs); if(mn===mx){mn-=1;mx+=1;}
+  const x=i=>P+(W-2*P)*(h.length===1?0:i/(h.length-1)); const y=v=>H-P-(H-2*P)*(v-mn)/(mx-mn);
+  const pts=h.map((p,i)=>[W-x(i),y(p.t)]);
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=line+` L${pts[pts.length-1][0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z`;
+  const last=pts[pts.length-1];
+  const f=d=>new Date(d).toLocaleDateString('he-IL',{month:'short',year:'2-digit'});
+  return `<section class="card spark"><h2>🚀 איך זה גדל</h2>
+  <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="גרף שווי כולל לאורך זמן">
+    <path d="${area}" fill="var(--accent2)" fill-opacity=".18"/>
+    <path d="${line}" fill="none" stroke="var(--accent2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+  </svg>
+  <div class="ends"><span>${f(h[0].d)}</span><span>${f(h[h.length-1].d)}</span></div></section>`;
+}
+
+/* ---------- sheets ---------- */
+function openSheet(html, onMount){ $('#sheet').innerHTML = '<div class="grab"></div>'+html; $('#veil').hidden = false; onMount && onMount($('#sheet')); }
+function closeSheet(){ $('#veil').hidden = true; $('#sheet').innerHTML=''; }
+$('#veil').addEventListener('click', e=>{ if(e.target.id==='veil') closeSheet(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#veil').hidden) closeSheet(); });
+let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 1800); }
+
+function editSheet(acc){
+  const isNew = !acc; acc = acc || {id:uid(), name:'', inst:'', cat:'bank', bal:0, cur:'ILS', upd:today()};
+  let cat = acc.cat;
+  const cats = Object.entries(CATS).map(([key,c])=>`<button type="button" data-cat="${key}" aria-pressed="${key===cat}" style="${k(key)}"><span>${c.emoji}</span>${esc(c.short)}</button>`).join('');
+  const curs = Object.keys(CUR).map(key=>`<option value="${key}" ${key===acc.cur?'selected':''}>${CUR[key]} ${key}</option>`).join('');
+  openSheet(`<h3>${isNew?'➕ חשבון חדש':CATS[acc.cat].emoji+' '+esc(acc.name)}</h3>
+    <form id="accForm" style="display:flex;flex-direction:column;gap:14px">
+      <div class="cats" role="group" aria-label="סוג">${cats}</div>
+      <label class="f">איך לקרוא לו<input id="fName" required placeholder="למשל: עו״ש משותף" value="${esc(acc.name)}"></label>
+      <label class="f">איפה הוא מנוהל<input id="fInst" placeholder="בנק, בית השקעות, חברת ביטוח" value="${esc(acc.inst)}"></label>
+      <label class="f">🔗 קישור לאתר (לא חובה)<input id="fLink" type="url" inputmode="url" dir="ltr" placeholder="www.example.co.il" value="${esc(acc.link||'')}"></label>
+      <div class="sugg" id="sugg"></div>
+      <p class="hint">בטלפון, הרבה אתרים של בנקים וקופות נפתחים ישר באפליקציה שלהם.</p>
+      <div class="two"><label class="f" id="balLbl">${CATS[cat].negative?'כמה נשאר להחזיר':'כמה יש שם'}<input id="fBal" inputmode="decimal" dir="ltr" value="${acc.bal||''}" placeholder="0"></label>
+      <label class="f">מטבע<select id="fCur">${curs}</select></label></div>
+      <div class="actions"><button class="primary" type="submit">💾 שמירה</button>
+      ${isNew?'':'<button class="danger" type="button" id="delBtn">🗑️</button>'}</div>
+    </form>`, s=>{
+      s.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{
+        cat=b.dataset.cat; s.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+        s.querySelector('#balLbl').firstChild.nodeValue = CATS[cat].negative?'כמה נשאר להחזיר':'כמה יש שם'; }));
+      s.querySelector('#accForm').addEventListener('submit', e=>{ e.preventDefault();
+        const bal = parseFloat(String(s.querySelector('#fBal').value).replace(/[,\s₪$€]/g,''))||0;
+        const next = {...acc, name:s.querySelector('#fName').value.trim()||'חשבון', inst:s.querySelector('#fInst').value.trim(), cat, cur:s.querySelector('#fCur').value, link:cleanUrl(s.querySelector('#fLink').value)};
+        if(isNew || Math.abs(bal)!==acc.bal){ next.bal=Math.abs(bal); next.upd=today(); }
+        state.accounts = isNew ? [...state.accounts, next] : state.accounts.map(a=>a.id===acc.id?next:a);
+        commit(); closeSheet(); toast(isNew?'🎉 נוסף!':'✅ נשמר'); });
+      const del = s.querySelector('#delBtn');
+      if(del) del.addEventListener('click', ()=>{ if(del.dataset.sure){ state.accounts=state.accounts.filter(a=>a.id!==acc.id); commit(); closeSheet(); toast('👋 נמחק'); }
+        else { del.dataset.sure='1'; del.textContent='בטוחה? ללחוץ שוב'; } });
+      const fInst=s.querySelector('#fInst'), fLink=s.querySelector('#fLink'), sugg=s.querySelector('#sugg');
+      const showSugg=()=>{ const g=suggestSite(fInst.value); sugg.innerHTML = g && !fLink.value ? `<button type="button">✨ ${esc(g)}</button>` : ''; };
+      sugg.addEventListener('click',e=>{ if(e.target.closest('button')){ fLink.value=suggestSite(fInst.value); sugg.innerHTML=''; } });
+      fInst.addEventListener('input',showSugg); fLink.addEventListener('input',showSugg); showSugg();
+      if(isNew) s.querySelector('#fName').focus();
+    });
+}
+
+function quickSheet(){
+  const rows = Object.keys(CATS).flatMap(c=>state.accounts.filter(a=>a.cat===c)).map(a=>
+    `<div class="qrow"><span class="e" aria-hidden="true">${CATS[a.cat].emoji}</span><div><b>${esc(a.name)}</b><small>${a.inst?esc(a.inst):esc(CATS[a.cat].name)}</small></div>
+     <input id="q_${a.id}" data-orig="${a.bal}" inputmode="decimal" value="${a.bal}" aria-label="יתרה ${esc(a.name)} ב-${a.cur}">${goLink(a)||'<span class="nogo"></span>'}</div>`).join('');
+  openSheet(`<h3>✍️ עדכון יתרות</h3><p class="sub">לוחצים 🔗 כדי להציץ ביתרה, חוזרים ומקלידים. משנים רק מה שזז.</p>
+    <div>${rows}</div><div class="actions"><button class="primary" type="button" id="qSave">💾 שמירת הכל</button><button class="ghost" type="button" id="qCancel">ביטול</button></div>`, s=>{
+      s.querySelectorAll('.qrow input').forEach(i=>i.addEventListener('input',()=>i.classList.toggle('changed', i.value!==i.dataset.orig)));
+      s.querySelector('#qCancel').addEventListener('click', closeSheet);
+      s.querySelector('#qSave').addEventListener('click', ()=>{
+        const d=today();
+        state.accounts = state.accounts.map(a=>{ const v=parseFloat(String(s.querySelector('#q_'+a.id).value).replace(/[,\s₪$€]/g,''));
+          if(isNaN(v)) return a; return {...a, bal:Math.abs(v), upd:d}; });
+        commit(); closeSheet(); toast('🎉 הכל מעודכן!'); });
+    });
+}
+
+function ratesSheet(){
+  openSheet(`<h3>💱 שערי מטבע</h3><p class="sub">להמרת חשבונות בדולר או ביורו לשקלים. מעדכנים ידנית.</p>
+    <div class="two" style="grid-template-columns:1fr 1fr"><label class="f">🇺🇸 דולר → ₪<input id="rUSD" inputmode="decimal" dir="ltr" value="${state.rates.USD}"></label>
+    <label class="f">🇪🇺 יורו → ₪<input id="rEUR" inputmode="decimal" dir="ltr" value="${state.rates.EUR}"></label></div>
+    <div class="actions"><button class="primary" type="button" id="rSave">💾 שמירה</button></div>`, s=>{
+      s.querySelector('#rSave').addEventListener('click', ()=>{
+        state.rates = {USD:parseFloat(s.querySelector('#rUSD').value)||state.rates.USD, EUR:parseFloat(s.querySelector('#rEUR').value)||state.rates.EUR};
+        commit(); closeSheet(); toast('✅ נשמר'); });
+    });
+}
+
+/* ---------- data ---------- */
+function snapshotHistory(){
+  if(state.example) return;
+  const d=today(), t=totals().total;
+  const h = state.history.filter(x=>x.d!==d); h.push({d,t:Math.round(t)});
+  state.history = h.sort((a,b)=>a.d<b.d?-1:1).slice(-400);
+}
+function commit(){ snapshotHistory(); render(); scheduleSave(); }
+function scheduleSave(){ dirty = true; clearTimeout(saveTimer); saveTimer=setTimeout(save, 600); }
+async function save(){
+  if(mode==='local'){ try{ localStorage.setItem('money-v1', JSON.stringify(state)); dirty=false; }catch(e){ setStatus('לא הצלחתי לשמור בדפדפן הזה 😕'); } return; }
+  if(!ref) return;
+  if(saving){ pending=true; return; }
+  saving=true;
+  try{ await ref.set(JSON.parse(JSON.stringify(state))); if(!pending) dirty=false; setStatus(''); }
+  catch(e){ setStatus(e && e.code==='quota_exceeded' ? 'אין מקום לשמור עוד נתונים 😕' : 'השמירה לא הצליחה 😕 השינויים יישמרו בעדכון הבא.'); }
+  saving=false; if(pending){ pending=false; save(); }
+}
+function setStatus(s){ $('#saveStatus').textContent = s; }
+
+function loadExample(){
+  const d=today(), old=new Date(Date.now()-95*86400000).toISOString().slice(0,10);
+  state = {...blank(), example:true, accounts:[
+    {id:uid(),name:'עו״ש',inst:'בנק לדוגמה',cat:'bank',bal:18400,cur:'ILS',upd:d,link:'https://example.com/'},
+    {id:uid(),name:'פיקדון שקלי',inst:'בנק לדוגמה',cat:'deposit',bal:40000,cur:'ILS',upd:d},
+    {id:uid(),name:'תיק מניות',inst:'בית השקעות',cat:'invest',bal:21500,cur:'USD',upd:d},
+    {id:uid(),name:'קרן השתלמות',inst:'קופה לדוגמה',cat:'hishtalmut',bal:96000,cur:'ILS',upd:old},
+    {id:uid(),name:'קופת גמל להשקעה',inst:'קופה לדוגמה',cat:'gemel',bal:33000,cur:'ILS',upd:d},
+    {id:uid(),name:'קרן פנסיה',inst:'חברת ביטוח',cat:'pension',bal:285000,cur:'ILS',upd:old},
+    {id:uid(),name:'הלוואת רכב',inst:'בנק לדוגמה',cat:'loan',bal:24000,cur:'ILS',upd:d},
+  ], history:[]};
+  const base = totals().total;
+  state.history = [180,150,120,90,60,30,0].map((n,i)=>({d:new Date(Date.now()-n*86400000).toISOString().slice(0,10), t:Math.round(base*(0.93+i*0.012))}));
+  render(); scheduleSave();
+}
+
+document.addEventListener('click', e=>{
+  const ed = e.target.closest('[data-edit]'); if(ed){ editSheet(state.accounts.find(a=>a.id===ed.dataset.edit)); return; }
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if(act==='add') editSheet(); if(act==='example') loadExample(); if(act==='quick') quickSheet();
+  if(act==='clear'){ state=blank(); render(); scheduleSave(); toast('🧹 נוקה'); }
+});
+$('#addBtn').addEventListener('click', ()=>editSheet());
+$('#quickBtn').addEventListener('click', quickSheet);
+$('#ratesBtn').addEventListener('click', ratesSheet);
+$('#backupBtn').addEventListener('click', backupSheet);
+function backupSheet(){
+  openSheet(`<h3>💾 גיבוי</h3><p class="sub">הנתונים נשמרים רק בטלפון הזה. כדאי לשמור קובץ גיבוי מדי פעם (למשל ב-Google Drive או iCloud), ככה שום דבר לא הולך לאיבוד.</p>
+    <div class="actions"><button class="primary" type="button" id="bSave">⬇️ שמירת קובץ גיבוי</button></div>
+    <label class="f">⬆️ טעינה מקובץ גיבוי<input id="bLoad" type="file" accept=".json,application/json"></label>
+    <p class="hint" id="bMsg"></p>`, s=>{
+      s.querySelector('#bSave').addEventListener('click', ()=>{
+        const blob=new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='גיבוי-הכסף-שלי-'+today()+'.json';
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+        try{ localStorage.setItem('money-v1-lastbackup', today()); }catch(e){}
+        toast('✅ קובץ הגיבוי נשמר'); });
+      s.querySelector('#bLoad').addEventListener('change', e=>{
+        const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+        r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!Array.isArray(d.accounts)) throw 0;
+            state={...blank(), ...d}; render(); scheduleSave(); closeSheet(); toast('🎉 הנתונים נטענו'); }
+          catch(err){ s.querySelector('#bMsg').textContent='😕 זה לא נראה כמו קובץ גיבוי של האפליקציה. נסי לבחור את הקובץ ששמרת מכאן.'; } };
+        r.readAsText(f); });
+    });
+}
+
+function useLocal(){
+  mode='local';
+  try{ const raw=localStorage.getItem('money-v1'); if(raw) state={...blank(), ...JSON.parse(raw)}; }catch(e){}
+  setStatus('📱 הנתונים נשמרים רק בטלפון הזה'); if(!window.claude) $('#backupBtn').hidden=false; render();
+}
+
+(async function init(){
+  if(!window.claude || !window.claude.use){ useLocal(); return; }
+  try{
+    const [user, db] = await Promise.all([window.claude.use('user'), window.claude.use('db')]);
+    const id = user ? await user.id() : null;
+    if(!db || !id){ useLocal(); return; }
+    ref = db.doc('data/users/' + id + '/wallet');
+    mode='cloud'; render();
+    const timer = setTimeout(()=>{ if(state.accounts.length===0) setStatus('📡 לא מצליחה להגיע לנתונים כרגע. הם יסונכרנו כשהחיבור יחזור.'); }, 10000);
+    ref.onSnapshot(snap=>{
+      if(!snap.metadata.fromCache){ clearTimeout(timer); if(!dirty) setStatus(''); }
+      if(!dirty && !saving && !pending){ state = snap.exists ? {...blank(), ...JSON.parse(JSON.stringify(snap.data()))} : state; render(); }
+    }, ()=>{ clearTimeout(timer); setStatus('📡 החיבור לנתונים נקטע. רענני את הדף כדי לנסות שוב.'); });
+  }catch(e){ useLocal(); }
+})();
+render();
+</script>
+
+</body>
+</html>
