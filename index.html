@@ -169,7 +169,7 @@ label.f input,label.f select{font:inherit;font-size:16px;color:var(--ink);paddin
 <div class="wrap" id="app">
   <header>
     <h1><span class="wave" aria-hidden="true">👋</span> הכסף שלי</h1>
-    <span style="display:flex;gap:8px"><button class="iconbtn" id="backupBtn" type="button" hidden>💾 גיבוי</button><button class="iconbtn" id="ratesBtn" type="button">💱 שערים</button></span>
+    <span style="display:flex;gap:8px"><button class="iconbtn" id="backupBtn" type="button" hidden>☁️ סנכרון</button><button class="iconbtn" id="ratesBtn" type="button">💱 שערים</button></span>
   </header>
   <div id="main" style="display:flex;flex-direction:column;gap:18px"><p class="status">טוען… ⏳</p></div>
   <p class="status" id="saveStatus"></p>
@@ -197,7 +197,7 @@ const CATS = {
   loan:      {name:'הלוואות ומשכנתא', short:'הלוואה',  emoji:'💳', color:'--c8', liquid:true,  staleDays:60, negative:true},
 };
 const CUR = {ILS:'₪', USD:'$', EUR:'€'};
-const blank = () => ({accounts:[], rates:{USD:3.7, EUR:4.0}, history:[], example:false});
+const blank = () => ({accounts:[], rates:{USD:3.7, EUR:4.0}, ratesTs:0, deleted:{}, history:[], changedAt:0, example:false});
 let state = blank();
 let mode = 'loading';
 let ref = null, saving = false, pending = false, saveTimer = null, dirty = false;
@@ -340,10 +340,11 @@ function editSheet(acc){
         const bal = parseFloat(String(s.querySelector('#fBal').value).replace(/[,\s₪$€]/g,''))||0;
         const next = {...acc, name:s.querySelector('#fName').value.trim()||'חשבון', inst:s.querySelector('#fInst').value.trim(), cat, cur:s.querySelector('#fCur').value, link:cleanUrl(s.querySelector('#fLink').value)};
         if(isNew || Math.abs(bal)!==acc.bal){ next.bal=Math.abs(bal); next.upd=today(); }
+        next.ts=Date.now();
         state.accounts = isNew ? [...state.accounts, next] : state.accounts.map(a=>a.id===acc.id?next:a);
         commit(); closeSheet(); toast(isNew?'🎉 נוסף!':'✅ נשמר'); });
       const del = s.querySelector('#delBtn');
-      if(del) del.addEventListener('click', ()=>{ if(del.dataset.sure){ state.accounts=state.accounts.filter(a=>a.id!==acc.id); commit(); closeSheet(); toast('👋 נמחק'); }
+      if(del) del.addEventListener('click', ()=>{ if(del.dataset.sure){ state.accounts=state.accounts.filter(a=>a.id!==acc.id); state.deleted={...(state.deleted||{}), [acc.id]:Date.now()}; commit(); closeSheet(); toast('👋 נמחק'); }
         else { del.dataset.sure='1'; del.textContent='בטוחה? ללחוץ שוב'; } });
       const fInst=s.querySelector('#fInst'), fLink=s.querySelector('#fLink'), sugg=s.querySelector('#sugg');
       const showSugg=()=>{ const g=suggestSite(fInst.value); sugg.innerHTML = g && !fLink.value ? `<button type="button">✨ ${esc(g)}</button>` : ''; };
@@ -364,7 +365,7 @@ function quickSheet(){
       s.querySelector('#qSave').addEventListener('click', ()=>{
         const d=today();
         state.accounts = state.accounts.map(a=>{ const v=parseFloat(String(s.querySelector('#q_'+a.id).value).replace(/[,\s₪$€]/g,''));
-          if(isNaN(v)) return a; return {...a, bal:Math.abs(v), upd:d}; });
+          if(isNaN(v)) return a; return {...a, bal:Math.abs(v), upd:d, ts:Date.now()}; });
         commit(); closeSheet(); toast('🎉 הכל מעודכן!'); });
     });
 }
@@ -375,7 +376,7 @@ function ratesSheet(){
     <label class="f">🇪🇺 יורו → ₪<input id="rEUR" inputmode="decimal" dir="ltr" value="${state.rates.EUR}"></label></div>
     <div class="actions"><button class="primary" type="button" id="rSave">💾 שמירה</button></div>`, s=>{
       s.querySelector('#rSave').addEventListener('click', ()=>{
-        state.rates = {USD:parseFloat(s.querySelector('#rUSD').value)||state.rates.USD, EUR:parseFloat(s.querySelector('#rEUR').value)||state.rates.EUR};
+        state.rates = {USD:parseFloat(s.querySelector('#rUSD').value)||state.rates.USD, EUR:parseFloat(s.querySelector('#rEUR').value)||state.rates.EUR}; state.ratesTs=Date.now();
         commit(); closeSheet(); toast('✅ נשמר'); });
     });
 }
@@ -387,7 +388,7 @@ function snapshotHistory(){
   const h = state.history.filter(x=>x.d!==d); h.push({d,t:Math.round(t)});
   state.history = h.sort((a,b)=>a.d<b.d?-1:1).slice(-400);
 }
-function commit(){ snapshotHistory(); render(); scheduleSave(); }
+function commit(){ state.changedAt=Date.now(); snapshotHistory(); render(); scheduleSave(); }
 function scheduleSave(){ dirty = true; clearTimeout(saveTimer); saveTimer=setTimeout(save, 600); }
 async function save(){
   if(mode==='local'){ try{ localStorage.setItem('money-v1', JSON.stringify(state)); dirty=false; }catch(e){ setStatus('לא הצלחתי לשמור בדפדפן הזה 😕'); } return; }
@@ -426,23 +427,85 @@ $('#addBtn').addEventListener('click', ()=>editSheet());
 $('#quickBtn').addEventListener('click', quickSheet);
 $('#ratesBtn').addEventListener('click', ratesSheet);
 $('#backupBtn').addEventListener('click', backupSheet);
+const SYNC_NAME='hakesef-sheli.json';
+const accTs = a => a.ts || (a.upd ? Date.parse(a.upd) : 0) || 0;
+function lastSync(){ try{ return JSON.parse(localStorage.getItem('money-v1-sync')||'{}'); }catch(e){ return {}; } }
+function markSync(kind){ try{ const x=lastSync(); x[kind]=Date.now(); localStorage.setItem('money-v1-sync', JSON.stringify(x)); }catch(e){} }
+const ago = t => { if(!t) return 'עוד לא'; const m=Math.round((Date.now()-t)/60000);
+  return m<1?'הרגע':m<60?`לפני ${m} דק׳`:m<1440?`לפני ${Math.round(m/60)} שעות`:`לפני ${Math.round(m/1440)} ימים`; };
+
+function mergeIn(remote){
+  if(!remote || !Array.isArray(remote.accounts)) throw new Error('bad');
+  if(state.example) state = blank();
+  const del = {...(state.deleted||{})};
+  for(const [id,t] of Object.entries(remote.deleted||{})) del[id] = Math.max(del[id]||0, t);
+  const L = new Map(state.accounts.map(a=>[a.id,a])), Rm = new Map(remote.accounts.map(a=>[a.id,a]));
+  let added=0, updated=0, removed=0; const out=[];
+  for(const id of new Set([...L.keys(), ...Rm.keys()])){
+    const a=L.get(id), b=Rm.get(id);
+    let pick = !a ? b : !b ? a : (accTs(b) > accTs(a) ? b : a);
+    if(del[id] && del[id] >= accTs(pick)){ if(a) removed++; continue; }
+    if(!a) added++; else if(pick===b && JSON.stringify(a)!==JSON.stringify(b)) updated++;
+    out.push(pick);
+  }
+  // keep the local order, then new ones
+  const order = state.accounts.map(a=>a.id);
+  out.sort((x,y)=>{ const i=order.indexOf(x.id), j=order.indexOf(y.id); return (i<0?1e9:i)-(j<0?1e9:j); });
+  const remoteNewer = (remote.changedAt||0) > (state.changedAt||0);
+  const hist = new Map((remote.history||[]).map(h=>[h.d,h]));
+  for(const h of (state.history||[])) if(!remoteNewer || !hist.has(h.d)) hist.set(h.d,h);
+  state = {...state, example:false, accounts:out, deleted:del,
+    rates: (remote.ratesTs||0) > (state.ratesTs||0) ? remote.rates : state.rates,
+    ratesTs: Math.max(remote.ratesTs||0, state.ratesTs||0),
+    history:[...hist.values()].sort((x,y)=>x.d<y.d?-1:1).slice(-400),
+    changedAt: Math.max(remote.changedAt||0, state.changedAt||0)};
+  snapshotHistory(); render(); scheduleSave();
+  return {added, updated, removed};
+}
+
+async function pushToDrive(){
+  const data = JSON.stringify({app:'hakesef', v:2, savedAt:Date.now(), ...state, example:false});
+  const file = new File([data], SYNC_NAME, {type:'application/json'});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); markSync('push'); return 'shared'; }
+  }catch(e){ if(e && e.name==='AbortError') return 'cancel'; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=SYNC_NAME;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  markSync('push'); return 'downloaded';
+}
+
 function backupSheet(){
-  openSheet(`<h3>💾 גיבוי</h3><p class="sub">הנתונים נשמרים רק בטלפון הזה. כדאי לשמור קובץ גיבוי מדי פעם (למשל ב-Google Drive או iCloud), ככה שום דבר לא הולך לאיבוד.</p>
-    <div class="actions"><button class="primary" type="button" id="bSave">⬇️ שמירת קובץ גיבוי</button></div>
-    <label class="f">⬆️ טעינה מקובץ גיבוי<input id="bLoad" type="file" accept=".json,application/json"></label>
-    <p class="hint" id="bMsg"></p>`, s=>{
-      s.querySelector('#bSave').addEventListener('click', ()=>{
-        const blob=new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
-        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='גיבוי-הכסף-שלי-'+today()+'.json';
-        document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-        try{ localStorage.setItem('money-v1-lastbackup', today()); }catch(e){}
-        toast('✅ קובץ הגיבוי נשמר'); });
-      s.querySelector('#bLoad').addEventListener('change', e=>{
-        const f=e.target.files[0]; if(!f) return; const r=new FileReader();
-        r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!Array.isArray(d.accounts)) throw 0;
-            state={...blank(), ...d}; render(); scheduleSave(); closeSheet(); toast('🎉 הנתונים נטענו'); }
-          catch(err){ s.querySelector('#bMsg').textContent='😕 זה לא נראה כמו קובץ גיבוי של האפליקציה. נסי לבחור את הקובץ ששמרת מכאן.'; } };
+  const ls=lastSync();
+  openSheet(`<h3>☁️ סנכרון עם Drive</h3>
+    <p class="sub">שניכם שומרים וטוענים את אותו קובץ מתיקייה משותפת ב-Drive. כשטוענים, כל חשבון נשאר בגרסה שעודכנה אחרונה, כך שאף אחד לא מוחק לשני.</p>
+    <div class="actions"><button class="primary" type="button" id="sPull">⬇️ טעינה מ-Drive</button></div>
+    <p class="hint">לפני שמעדכנים · ${ago(ls.pull)}</p>
+    <div class="actions"><button class="ghost" type="button" id="sPush" style="flex:1">⬆️ שמירה ל-Drive</button></div>
+    <p class="hint">אחרי שמעדכנים · ${ago(ls.push)}</p>
+    <input id="sFile" type="file" accept=".json,application/json,text/plain" hidden>
+    <p class="hint" id="sMsg" role="status"></p>
+    <details style="font-size:14px;color:var(--muted)"><summary style="cursor:pointer">💡 איך זה עובד בפעם הראשונה</summary>
+      <ol style="padding-inline-start:20px;margin:8px 0 0;display:flex;flex-direction:column;gap:6px">
+        <li>אחד מכם יוצר ב-Drive תיקייה, למשל "הכסף שלנו", ומשתף אותה עם השני (עריכה).</li>
+        <li><b>שמירה:</b> לוחצים "שמירה ל-Drive", בוחרים <b>שמירה בקבצים</b> (Save to Files), נכנסים ל-Google Drive ולתיקייה, ולוחצים שמירה. אם שואלים, בוחרים <b>החלפה</b>, כדי שיהיה תמיד קובץ אחד.</li>
+        <li><b>טעינה:</b> לוחצים "טעינה מ-Drive", ובבורר הקבצים נכנסים ל-Google Drive ובוחרים את ${SYNC_NAME}.</li>
+        <li>אם Drive לא מופיע בקבצים: באפליקציית "קבצים" לוחצים ⋯ ← עריכה ומפעילים את Google Drive. צריך שאפליקציית Google Drive תהיה מותקנת.</li>
+      </ol></details>`, s=>{
+      const msg=s.querySelector('#sMsg'), fi=s.querySelector('#sFile');
+      s.querySelector('#sPull').addEventListener('click', ()=>{ fi.value=''; fi.click(); });
+      fi.addEventListener('change', ()=>{
+        const f=fi.files[0]; if(!f) return; const r=new FileReader();
+        r.onload=()=>{ try{ const res=mergeIn(JSON.parse(r.result)); markSync('pull'); closeSheet();
+            const parts=[]; if(res.added) parts.push(`${res.added} חדשים`); if(res.updated) parts.push(`${res.updated} עודכנו`); if(res.removed) parts.push(`${res.removed} נמחקו`);
+            toast(parts.length ? '🔄 '+parts.join(' · ') : '✅ הכל כבר מעודכן'); }
+          catch(e){ msg.textContent='😕 זה לא נראה כמו קובץ של האפליקציה. בחרי את '+SYNC_NAME+'.'; } };
+        r.onerror=()=>{ msg.textContent='😕 לא הצלחתי לקרוא את הקובץ. נסי שוב.'; };
         r.readAsText(f); });
+      s.querySelector('#sPush').addEventListener('click', async ()=>{
+        const r=await pushToDrive();
+        if(r==='shared'){ closeSheet(); toast('☁️ נשלח לשמירה'); }
+        else if(r==='downloaded'){ msg.textContent='הקובץ ירד להורדות. משם אפשר להעביר אותו לתיקייה ב-Drive.'; }
+      });
     });
 }
 
